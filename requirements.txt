@@ -1,0 +1,33 @@
+uvicorn==0.52.4
+fastapi==0.141.1
+pyarrow==25.0.1
+pandas==3.0.5
+SQLAlchemy==2.0.52
+psycopg==3.3.4
+psycopg2==2.9.12
+psycopg-binary==3.3.4
+psycopg2-binary==2.9.13
+python-dotenv
+
+#TESTES
+pytest==9.1.1
+httpx==0.28.1
+requests==2.34.2
+
+#SEGURANÇA
+python-jose[cryptography]
+passlib[bcrypt]
+
+
+#FERRAMENTAS
+
+alembic==1.20.0
+#python -m alembic init alembic
+#python -m alembic revision --autogenerate -m "cria tabela contas a pagar e receber"
+# comando para fazer a atualização das tabelas geradas pelo alembic: python -m alembic upgrade head
+#comando para fazer o rollback de uma atualização do alembic: python -m downgrade -1
+
+# pip install -r requirements.txt
+# pip freeze para ver todas as bibliotecas instaladas na máquina
+
+#pip freeze | Select-String sql

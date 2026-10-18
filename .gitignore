@@ -1,0 +1,19 @@
+# Banco de dados SQLite
+*.db
+
+# Arquivos de ambiente
+.env
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Ambiente virtual
+.venv/
+venv/
+
+# Configurações do VS Code
+.vscode/
+
+# Arquivos de log
+*.log
