@@ -17,6 +17,7 @@ from shared.exceptions import NotFound
 router = APIRouter(prefix="/contas-a-pagar-e-receber")
 
 
+QUANTIDADE_REGISTROS_MES = 100
 #DTO de saída
 #é uma das classes mais importantes do Pydantic e é amplamente utilizada no FastAPI para definir e validar dados.
 
@@ -25,6 +26,7 @@ class ContaPagarReceberResponse(BaseModel):
     descricao: str 
     valor:float
     tipo: str    #PAGAR, RECEBER
+    date_previsao: date
     data_baixa: datetime  | None = None
     valor_baixa: float  | None = None
     esta_baixada: bool  | None = None
@@ -45,6 +47,7 @@ class ContaPagarReceberTipoEnum(str, Enum):
 class ContaPagarReceberRequest(BaseModel):
     descricao: str = Field(min=3, max_length=30)
     valor: float = Field(gt=0)
+    date_previsao: date
     tipo: ContaPagarReceberTipoEnum   #PAGAR, RECEBER
     fornecedor_cliente_id: int | None = None
     
@@ -87,7 +90,8 @@ async def listar_contas(db: Session = Depends(get_db)) -> list[ContaPagarReceber
 @router.post("", response_model=ContaPagarReceberResponse, status_code=201)    
 def criar_conta(conta_request: ContaPagarReceberRequest, db: Session = Depends(get_db)) -> ContaPagarReceberResponse:
     
-    print(f'quantidade: {recupera_numero_registros(2026,10,db)}')
+    print(f'Quantiade registro db: {recupera_numero_registros(conta_request.date_previsao.year, conta_request.date_previsao.month, db)}')
+    valida_se_pode_registrar_novas_contas(conta_request, db)
     
     
     contas_a_pagar_e_receber = contaPagarReceber(**conta_request.dict()) #passa já todos os parâmetros do model
@@ -181,19 +185,16 @@ def busca_conta_por_id(id_conta: int, db: Session = Depends(get_db)) -> contaPag
 
 def recupera_numero_registros(ano: int, mes: int, db: Session = Depends(get_db)) -> int:
     quantidade_registro = (db.query(contaPagarReceber).filter(
-            extract('year',  contaPagarReceber.data_baixa) == ano,
-            extract('month',contaPagarReceber.data_baixa) == mes).count())
+            extract('year',  contaPagarReceber.date_previsao) == ano,
+            extract('month',contaPagarReceber.date_previsao) == mes).count())
     return quantidade_registro
     
     
-def valida_se_pode_registrar_novas_contas(ano: int, mes: int, db: Session = Depends(get_db)) -> bool:
-    if recupera_numero_registros(ano,mes, db) > 100:
-        return False
-    return True   
-    
-def lanca_excecao_quando_ultrapassar_numero_registros(contas_a_pagar_e_receber_resquest: ContaPagarReceberRequest,
+def valida_se_pode_registrar_novas_contas(contas_a_pagar_e_receber_resquest: ContaPagarReceberRequest,
                                                     db: Session = Depends(get_db)) -> None:
-    if valida_se_pode_registrar_novas_contas(contas_a_pagar_e_receber_resquest.ano, contas_a_pagar_e_receber_resquest.mes, db):
+    if recupera_numero_registros(contas_a_pagar_e_receber_resquest.date_previsao.year, 
+                                contas_a_pagar_e_receber_resquest.date_previsao.month, 
+                                db) > QUANTIDADE_REGISTROS_MES:
         raise HTTPException(status_code=404, detail="Não é possível cadastrar. Ultrapassou o número de registros permitidos para o mês")
     
 

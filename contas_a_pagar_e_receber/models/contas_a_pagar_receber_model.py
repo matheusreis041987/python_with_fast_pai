@@ -10,7 +10,7 @@ class contaPagarReceber(Base):
     descricao = Column (String(255))
     valor = Column(Numeric(10,2))
     tipo = Column(String(30))
-    date_previsao = Column(DateTime(), nullable=False)
+    date_previsao = Column(Date(), nullable=False)
     data_baixa = Column(DateTime())
     valor_baixa = Column(Numeric())
     esta_baixada = Column(Boolean(), default=False)
