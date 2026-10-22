@@ -37,18 +37,18 @@ app.dependency_overrides[get_db] = override_get_db
 def test_deve_listar_contas_a_pagar_e_receber():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-    response = client.post("/contas-a-pagar-e-receber", json={'descricao': 'Aluguel', 'valor': 2500.45, 'tipo': 'PAGAR'})
-    response = client.post("/contas-a-pagar-e-receber", json={'descricao': 'Dividendos', 'valor': 15000, 'tipo': 'RECEBER'})
-    response = client.post("/contas-a-pagar-e-receber", json={'descricao': 'Folha de pagamento', 'valor': 45865.45, 'tipo': 'PAGAR'})
+    response = client.post("/contas-a-pagar-e-receber", json={'descricao': 'Aluguel', 'valor': 2500.45, 'tipo': 'PAGAR', "date_previsao": "2026-10-18"})
+    response = client.post("/contas-a-pagar-e-receber", json={'descricao': 'Dividendos', 'valor': 15000, 'tipo': 'RECEBER', "date_previsao": "2026-10-18"})
+    response = client.post("/contas-a-pagar-e-receber", json={'descricao': 'Folha de pagamento', 'valor': 45865.45, 'tipo': 'PAGAR', "date_previsao": "2026-10-18"})
     
     response = client.get("/contas-a-pagar-e-receber")
         
     assert response.status_code == 200
 
     assert response.json() == [
-        {'id': 1, 'descricao': 'Aluguel', 'valor': 2500.45, 'tipo': 'PAGAR', "data_baixa": None, "valor_baixa": None,  "esta_baixada":False, 'fornecedor': None}, 
-        {'id': 2, 'descricao': 'Dividendos', 'valor': 15000, 'tipo': 'RECEBER', "data_baixa": None, "valor_baixa": None,  "esta_baixada":False, 'fornecedor': None}, 
-        {'id': 3, 'descricao': 'Folha de pagamento', 'valor': 45865.45, 'tipo': 'PAGAR', "data_baixa": None, "valor_baixa": None,  "esta_baixada":False, 'fornecedor': None}
+        {'id': 1, 'descricao': 'Aluguel', 'valor': 2500.45, 'tipo': 'PAGAR', "date_previsao": "2026-10-18", "data_baixa": None, "valor_baixa": None,  "esta_baixada":False, 'fornecedor': None}, 
+        {'id': 2, 'descricao': 'Dividendos', 'valor': 15000, 'tipo': 'RECEBER', "date_previsao": "2026-10-18", "data_baixa": None, "valor_baixa": None,  "esta_baixada":False, 'fornecedor': None}, 
+        {'id': 3, 'descricao': 'Folha de pagamento', 'valor': 45865.45, 'tipo': 'PAGAR', "date_previsao": "2026-10-18", "data_baixa": None, "valor_baixa": None,  "esta_baixada":False, 'fornecedor': None}
         ]
     
 def test_deve_criar_conta_a_pagar_e_receber():
@@ -58,6 +58,7 @@ def test_deve_criar_conta_a_pagar_e_receber():
         "descricao" : "Curso de python com fastAPI",
         "valor" : 2500.98,
         "tipo" : "PAGAR",
+        "date_previsao": '2026-10-18',
         "data_baixa": None,
         "valor_baixa": None, 
         "esta_baixada": False,
@@ -74,7 +75,8 @@ def test_deve_retornar_erro_quando_exceder_a_descricao():
     response = client.post("/contas-a-pagar-e-receber", json={
         'descricao': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 
         'valor': 2500.45, 
-        'tipo': 'PAGAR'
+        'tipo': 'PAGAR',
+        "date_previsao": "2026-10-18"
         })
     
     assert response.status_code == 422
@@ -91,7 +93,8 @@ def test_deve_retornar_erro_quando_exceder_do_valor():
     response = client.post("/contas-a-pagar-e-receber", json={
         'descricao': 'titulo bancário', 
         'valor': 'aaaa', 
-        'tipo': 'PAGARRIA'})
+        'tipo': 'PAGARRIA',
+        "date_previsao": "2026-10-18"})
     
     assert response.status_code == 422
     
@@ -99,7 +102,8 @@ def test_deve_retornar_erro_quando_exceder_do_valor_negativo():
     response = client.post("/contas-a-pagar-e-receber", json={
         'descricao': 'titulo bancário', 
         'valor': -122, 
-        'tipo': 'PAGARRIA'})
+        'tipo': 'PAGARRIA',
+        "date_previsao": "2026-10-18"})
     
     assert response.status_code == 422
     
@@ -110,14 +114,17 @@ def test_deve_atualizar_conta_a_pagar_e_receber():
     response = client.post("/contas-a-pagar-e-receber", json={
     'descricao': 'titulo bancário', 
     'valor': 100, 
-    'tipo': 'PAGAR'})
+    'tipo': 'PAGAR',
+    'date_previsao': '2026-10-18'
+    })
     
     id_da_conta = response.json()['id']
     
     response_put = client.put(f"/contas-a-pagar-e-receber/{id_da_conta}", json={   
     'descricao': 'titulo bancário', 
     'valor': 150, 
-    'tipo': 'PAGAR'})
+    'tipo': 'PAGAR',
+    'date_previsao': '2026-10-18'})
     
     assert response_put.status_code == 200
     assert response_put.json()['valor'] == 150
@@ -130,7 +137,8 @@ def test_deve_remover_conta_a_pagar_e_receber():
     response = client.post("/contas-a-pagar-e-receber", json={
     'descricao': 'titulo bancário2', 
     'valor': 150, 
-    'tipo': 'PAGAR'})
+    'tipo': 'PAGAR',
+    'date_previsao': '2026-10-18'})
     
     id_da_conta = response.json()['id']
     
@@ -145,7 +153,8 @@ def test_deve_pegar_por_id():
     response = client.post("/contas-a-pagar-e-receber", json={
     'descricao': 'titulo bancário2', 
     'valor': 150, 
-    'tipo': 'PAGAR'})
+    'tipo': 'PAGAR',
+    'date_previsao': '2026-10-18'})
     
     id = response.json()['id']
     
@@ -153,7 +162,8 @@ def test_deve_pegar_por_id():
     assert response_get.status_code == 200
     assert response_get.json()['valor'] == 150
     assert response_get.json()['descricao'] == 'titulo bancário2' 
-    assert response_get.json()['tipo'] == 'PAGAR'    
+    assert response_get.json()['tipo'] == 'PAGAR'  
+    assert response_get.json()['date_previsao']  == '2026-10-18'
     
 def test_deve_pegar_por_id_invalido():
     Base.metadata.drop_all(bind=engine)
@@ -178,6 +188,7 @@ def test_deve_criar_conta_a_pagar_e_receber_com_fornecedor():
         "descricao" : "Curso de python com fastAPI",
         "valor" : 2500.98,
         "tipo" : "PAGAR",
+        "date_previsao": "2026-10-18",
         "data_baixa": None,
         "valor_baixa": None,
         "esta_baixada": False,
@@ -193,6 +204,7 @@ def test_deve_criar_conta_a_pagar_e_receber_com_fornecedor():
             "descricao" : "Curso de python com fastAPI",
             "valor" : 2500.98,
             "tipo" : "PAGAR",
+            "date_previsao": "2026-10-18",
             'fornecedor_cliente_id': 1 
         }
     client.post("/fornecedor-cliente", json=novo_fornecedor)
@@ -209,7 +221,8 @@ def test_deve_baixar_conta():
     client.post("/contas-a-pagar-e-receber", json={
         'descricao': 'titulo bancário', 
         'valor': 2500.45, 
-        'tipo': 'PAGAR'
+        'tipo': 'PAGAR',
+        'date_previsao': '2026-10-18'
         })
     
     response_acao = client.post(f'/contas-a-pagar-e-receber/1/baixar')
@@ -219,3 +232,43 @@ def test_deve_baixar_conta():
     response_acao.json()['esta_baixada'] is True
     response_acao.json()['valor_baixa'] == 2500.45
     response_acao.json()['data_baixa'] is datetime
+    
+    
+def test_limite_de_registros_mensais():
+        Base.metadata.drop_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
+        respostas = []
+        for i in range(0, 101):
+            resposta = client.post("/contas-a-pagar-e-receber", json={
+            'descricao': 'titulo bancário', 
+            'valor': 2500.45, 
+            'tipo': 'PAGAR',
+            'date_previsao': '2026-10-18'
+            })
+            respostas.append(resposta)
+            if i != 101:
+                assert resposta.status_code == 201
+            if i == 101:
+                assert resposta.status_code == 422
+
+
+
+def test_relatorio_gasto_previsto():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+    for i in range(0, 10):
+
+        client.post("/contas-a-pagar-e-receber", json={
+        'descricao': 'titulo bancário', 
+        'valor': 10, 
+        'tipo': 'PAGAR',
+        'date_previsao': '2026-10-18'
+                })
+
+    response = client.get("/contas-a-pagar-e-receber/previsao-gastos-por-mes")
+    resultado = response.json()
+    assert response.status_code == 200
+    assert len(resultado) == 1
+    assert resultado[0]['mes'] == 10
+    assert resultado[0]['valor_total'] == "100.00"

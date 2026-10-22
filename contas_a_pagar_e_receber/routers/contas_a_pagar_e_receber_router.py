@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from decimal import Decimal
 from sqlalchemy import extract, text
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import List, Optional
 
 from contas_a_pagar_e_receber.models.fornecedor_cliente_model import FornecedorCliente
 from contas_a_pagar_e_receber.routers.fornecedor_cliente_router import FornecedorClienteResponse
@@ -51,6 +51,16 @@ class ContaPagarReceberRequest(BaseModel):
     tipo: ContaPagarReceberTipoEnum   #PAGAR, RECEBER
     fornecedor_cliente_id: int | None = None
     
+
+class previsao_por_mes(BaseModel):
+    mes: int
+    valor_total: Decimal
+
+
+@router.get("/previsao-gastos-por-mes", response_model=list[previsao_por_mes])
+async def lista_previsao(ano = date.today().year, db: Session = Depends(get_db)) :
+    return relatorio_gastos_previstos_por_mes_de_um_ano(ano, db)
+
     
 
 @router.get("", response_model=list[ContaPagarReceberResponse])
@@ -200,7 +210,24 @@ def valida_se_pode_registrar_novas_contas(contas_a_pagar_e_receber_resquest: Con
 
 
 
+def relatorio_gastos_previstos_por_mes_de_um_ano(ano: int,  db: Session = Depends(get_db)) -> list[previsao_por_mes]:
+    contas = db.query(contaPagarReceber).filter(
+            extract('year',  contaPagarReceber.date_previsao) == ano
+    ).filter(
+        contaPagarReceber.tipo == ContaPagarReceberTipoEnum.PAGAR
+        ).order_by(contaPagarReceber.date_previsao.desc()).all()
+    
+    valor_por_mes = {}
+    
+    for conta in contas:
+        mes = conta.date_previsao.month
+        valor = conta.valor
+        valor_por_mes[mes] = valor_por_mes.get(mes, 0) + valor
+    
+    return [previsao_por_mes(mes=k,valor_total=g) for k, g in valor_por_mes.items()]
 
+
+    
 
 
 

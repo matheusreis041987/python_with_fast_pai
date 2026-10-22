@@ -100,3 +100,4 @@ def test_deve_remover_cliente_fornecedor():
     
     assert response_put.status_code == 204
 
+

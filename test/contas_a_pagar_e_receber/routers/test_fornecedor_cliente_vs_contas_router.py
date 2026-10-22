@@ -42,6 +42,7 @@ def test_deve_listar_contas_de_um_fornecedor_cliente():
                 json={'descricao': 'Curso Python', 
                       'valor': 2500.45, 
                       'tipo': 'PAGAR',
+                      'date_previsao': '2026-10-18',
                       'fornecedor_cliente_id' : 1
                       }
                 )
@@ -49,6 +50,7 @@ def test_deve_listar_contas_de_um_fornecedor_cliente():
                 json={'descricao': 'Curso de Guitarra', 
                       'valor': 15000, 
                       'tipo': 'PAGAR',
+                      'date_previsao': '2026-10-18',
                       'fornecedor_cliente_id' : 2
                       }
                 )    

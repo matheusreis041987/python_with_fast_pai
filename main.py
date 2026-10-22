@@ -4,6 +4,7 @@ import uvicorn
 from contas_a_pagar_e_receber.routers.contas_a_pagar_e_receber_router import router
 from contas_a_pagar_e_receber.routers.fornecedor_cliente_router import router_fornecedor
 from contas_a_pagar_e_receber.routers.fornecedor_cliente_vs_contas_router import router_vs
+from contas_a_pagar_e_receber.routers.contratos_router import router_contrato
 from shared.exceptions import NotFound
 from shared.exceptions_handler import not_found_exception_handler
 from shared.audit import AuditMiddleware
@@ -42,6 +43,7 @@ async def ola() -> str:
 app.include_router(router)
 app.include_router(router_fornecedor)
 app.include_router(router_vs)
+app.include_router(router_contrato)
 
 if __name__ == "__main__":
     uvicorn.run(app, host='0.0.0.0', port=8087)   

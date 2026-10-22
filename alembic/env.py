@@ -23,6 +23,9 @@ from contas_a_pagar_e_receber.models.contas_a_pagar_receber_model import contaPa
 # noinspection PyUnresolvedReferences
 from contas_a_pagar_e_receber.models.fornecedor_cliente_model import FornecedorCliente
 
+# noinspection PyUnresolvedReferences
+from contas_a_pagar_e_receber.models.contratos import contratos
+
 from shared.database import Base
 
 target_metadata = Base.metadata
