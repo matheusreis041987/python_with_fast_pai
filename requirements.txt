@@ -31,3 +31,5 @@ alembic==1.20.0
 # pip freeze para ver todas as bibliotecas instaladas na máquina
 
 #pip freeze | Select-String sql
+
+
